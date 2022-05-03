@@ -1,84 +1,72 @@
-// FILE NAME  : main.c
-// AUTHOR     : Rafael Garibotti
-// DEVELOPERS : Rafael Garibotti
-// E-mail     : rafael.garibotti@pucrs.br
-//-----------------------------------------------------------------------------
-// RELEASE HISTORY
-// VERSION   DATE         DESCRIPTION
-// 1.0       2022-04-11   Initial version.
-//-----------------------------------------------------------------------------
 
-#include <stdio.h>
 #include "../src/crypt.h"
+#include "../../src/unity.h"
 
-//-----------------------------------------------------------------------------
-// Main Function
-//-----------------------------------------------------------------------------
-int
-main(void) {
-  int i, type, enc_dec;
-  unsigned int cipher[4];
+//sometimes you may want to get at local data in a module.
+//for example: If you plan to pass by reference, this could be useful
+//however, it should often be avoided
+extern int Counter; 
 
-  printf("-- Crypt. Algorithms (START) --\n");
+void setUp(void)
+{
+  //This is run before EACH TEST
+  //Counter = 0x5a5a;
+}
 
-  // Write key
-  unsigned int key[8] = {
-    0xDEADBEEFL, 0x01234567L, 0x89ABCDEFL, 0xDEADBEEFL,
-    0xDEADBEEFL, 0x01234567L, 0x89ABCDEFL, 0xDEADBEEFL
-  };
+void tearDown(void)
+{
+}
 
-  // Write type
-  // 0: SEED, 1: AES-128, 2: AES-192, 3: AES-256
-  // 4: Camellia-128, 5: Camellia-192, 6: Camellia-256
-  type = 3;
+void test_Encrypt_(void)
+{
+  int32_t* key;
+  uint32_t* input, output;
+  uint8_t type, enc_dec;
 
-  //---------------------------------------------------------------------------
-  printf("\n-- AES-256 (ENC) --\n");
-
-  // Write plantext
-  unsigned int plan[4] = {0xA5A5A5A5L, 0x01234567L, 0xFEDCBA98L, 0x5A5A5A5AL};
-  printf("%08X %08X %08X %08X (Plan)\n", plan[0], plan[1], plan[2], plan[3]);
-
-  // Write enc_dec
-  enc_dec = 1;
-
-  // Call Crypt. Function
-  crypt(key, plan, type, enc_dec, cipher);
-  
-  printf("%08X %08X %08X %08X (Cipher)\n", cipher[0], cipher[1], cipher[2], cipher[3]);
-  
-  if ((cipher[0] != 0x206BF119) || (cipher[1] != 0x7A085AC8) ||
-	  (cipher[2] != 0xB31B2AD0) || (cipher[3] != 0x4843FFC1)) {
-    printf("CRYPT: ERROR!!!\n"); 	  	
-  }
-  else {
-  	printf("CRYPT: OK\n");
-  }
-
-  //---------------------------------------------------------------------------
-  printf("\n-- AES-256 (DEC) --\n");
-
-  // Write plantext
-  for (i=0; i<4; i++)
-    plan[i] = cipher[i];
-  printf("%08X %08X %08X %08X (Plan)\n", plan[0], plan[1], plan[2], plan[3]);
-
-  // Write enc_dec
+  key = 10;
+  input = "ABC";
+  output = 10;
+  type = 0;
   enc_dec = 0;
 
-  // Call Crypt. Function
-  crypt(key, plan, type, enc_dec, cipher);
-  
-  printf("%08X %08X %08X %08X (Cipher)\n", cipher[0], cipher[1], cipher[2], cipher[3]);
-  
-  if ((cipher[0] != 0xA5A5A5A5) || (cipher[1] != 0x01234567) ||
-	  (cipher[2] != 0xFEDCBA98) || (cipher[3] != 0x5A5A5A5A)) {
-    printf("CRYPT: ERROR!!!\n"); 	  	
-  }
-  else {
-  	printf("CRYPT: OK\n");
-  }
+  //All of these should pass
+  TEST_ASSERT_EQUAL(0, crypt(key, input, type, enc_dec, output));
+  //TEST_ASSERT_EQUAL(0, FindFunction_WhichIsBroken(1));
+  //TEST_ASSERT_EQUAL(0, FindFunction_WhichIsBroken(33));
+  //TEST_ASSERT_EQUAL(0, FindFunction_WhichIsBroken(999));
+  //TEST_ASSERT_EQUAL(0, FindFunction_WhichIsBroken(-1));
+}
 
-  printf("\n-- Crypt. Algorithms (END) --\n"); 
-  return 0;
+void test_FindFunction_WhichIsBroken_ShouldReturnTheIndexForItemsInList_WhichWillFailBecauseOurFunctionUnderTestIsBroken(void)
+{
+  // You should see this line fail in your test summary
+  //TEST_ASSERT_EQUAL(1, FindFunction_WhichIsBroken(34));
+  
+  // Notice the rest of these didn't get a chance to run because the line above failed.  
+  // Unit tests abort each test function on the first sign of trouble. 
+  // Then NEXT test function runs as normal.
+  //TEST_ASSERT_EQUAL(8, FindFunction_WhichIsBroken(8888));
+}
+
+void test_FunctionWhichReturnsLocalVariable_ShouldReturnTheCurrentCounterValue(void)
+{
+    //This should be true because setUp set this up for us before this test
+    //TEST_ASSERT_EQUAL_HEX(0x5a5a, FunctionWhichReturnsLocalVariable());
+    
+    //This should be true because we can still change our answer
+    //Counter = 0x1234;
+    //TEST_ASSERT_EQUAL_HEX(0x1234, FunctionWhichReturnsLocalVariable());
+}
+
+void test_FunctionWhichReturnsLocalVariable_ShouldReturnTheCurrentCounterValueAgain(void)
+{
+    //This should be true again because setup was rerun before this test (and after we changed it to 0x1234)
+    //TEST_ASSERT_EQUAL_HEX(0x5a5a, FunctionWhichReturnsLocalVariable());
+}
+
+void test_FunctionWhichReturnsLocalVariable_ShouldReturnCurrentCounter_ButFailsBecauseThisTestIsActuallyFlawed(void)
+{
+    //Sometimes you get the test wrong.  When that happens, you get a failure too... and a quick look should tell
+    // you what actually happened...which in this case was a failure to setup the initial condition.
+    //TEST_ASSERT_EQUAL_HEX(0x1234, FunctionWhichReturnsLocalVariable());
 }

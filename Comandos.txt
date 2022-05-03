@@ -1,4 +1,0 @@
-gcc
-
-(cd /other/dir && make)
-

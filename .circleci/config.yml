@@ -24,8 +24,11 @@ jobs:
           name: "Install valgrind"
           command: sudo apt install valgrind
       - run:
-          name: "Install valgrind"
-          command: sudo apt install sanitizer
+          name: "Run cppcheck"
+          command: cppcheck crypt/src/*.c
+      - run:
+          name: "Test Routine Make"
+          command: cd crypt && make
       - run:
           name: "Test Routine Make"
           command: cd crypt && make
