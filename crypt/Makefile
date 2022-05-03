@@ -2,7 +2,7 @@
 
 ##### Compiler options #####
 CC = gcc
-CFLAGS = -c -Wall
+CFLAGS = -c -Wall -fprofile-arcs -ftest-coverage
 
 ##### Project specific libraries #####
 SRC_FILES += $(wildcard src/*.c)
@@ -25,7 +25,6 @@ all: $(SRC_FILES) $(TEST_FILES)
 
 #aes.o: src/aes.c
 #	$(CC) $(CFLAGS) $^
-
 #camellia.o: src/camellia.c
 #	$(CC) $(CFLAGS) $^
 
@@ -34,3 +33,5 @@ all: $(SRC_FILES) $(TEST_FILES)
 
 clean:
 	rm -rf *.o app
+
+cov:
