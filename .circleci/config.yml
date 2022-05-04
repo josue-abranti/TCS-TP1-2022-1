@@ -31,10 +31,10 @@ jobs:
           command: cd crypt && make compile
       - run:
           name: "Run Valgrind"
-          command: cd crypt && make valgrind
+          command: make valgrind
       - run:
           name: "Run Sanitizer"
-          command: cd crypt && make sanitizer
+          command: make sanitizer
       - run:
           name: "Run Gcov"
           command: gcov src/*.c
