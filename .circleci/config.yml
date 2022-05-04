@@ -37,10 +37,10 @@ jobs:
           command: cd crypt && sudo chmod a+x ./all_tests.out && make valgrind
       - run:
           name: "Run Tests"
-          command: cd crypt && make sanitizer
+          command: cd crypt && make run
       - run:
           name: "Run Sanitizer"
-          command: cd crypt && run
+          command: cd crypt && make sanitizer
       - run:
           name: "Run Gcov"
           command: cd crypt && sudo chmod a+x src && make gcov
