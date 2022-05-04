@@ -25,7 +25,7 @@ jobs:
           command: sudo apt install valgrind
       - run:
           name: "Install Sanitizer"
-          command: sudo apt-get install sanitizer
+          command: sudo apt-get install maildrop && sudo apt-get install sanitizer
       - run:
           name: "Run cppcheck"
           command: cppcheck crypt/src/*.c
