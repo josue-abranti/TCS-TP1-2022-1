@@ -40,7 +40,6 @@ CFLAGS += -Wundef
 CFLAGS += -Wold-style-definition
 CFLAGS += -fprofile-arcs
 CFLAGS += -ftest-coverage
-CFLAGS += -coverage
 
 TARGET_BASE=tests
 TARGET = $(TARGET_BASE)$(TARGET_EXTENSION)
@@ -75,6 +74,4 @@ run:
 	- ./$(TARGET) -v
 
 clean:
-	rm -rf *.o app
-	rm -rf *.gcov
-	rm -rf *.gcno
+	rm -fr $(ALL) *.o cov* *.dSYM *.gcda *.gcno *.gcov
