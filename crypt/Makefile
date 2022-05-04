@@ -65,10 +65,11 @@ valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all ./all_tests.out 
 
 gcov:
-	gcov src/aes.c
-	gcov src/camellia.c
-	gcov src/crypt.c
-	gcov src/seed.c
+	$(shell ls)
+#gcov src/aes.c
+#gcov src/camellia.c
+#gcov src/crypt.c
+#gcov src/seed.c
 
 clean:
 	rm -rf *.o app
