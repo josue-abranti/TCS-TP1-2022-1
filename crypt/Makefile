@@ -71,7 +71,7 @@ gcov:
 	gcov -b seed.c
 
 run:
-	- ./$(TARGET) -v
+	- ./$(TARGET)
 
 clean:
 	rm -fr $(ALL) *.o cov* *.dSYM *.gcda *.gcno *.gcov
