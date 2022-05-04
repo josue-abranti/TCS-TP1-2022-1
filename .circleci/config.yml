@@ -27,11 +27,14 @@ jobs:
           name: "Run cppcheck"
           command: cppcheck crypt/src/*.c
       - run:
-          name: "Run Sanitizer"
-          command: make sanitizer
-      - run:
           name: "Test Routine Make"
-          command: cd crypt && make compile
+          command: make compile
+      - run:
+          name: "Run Valgrind"
+          command: cd crypt && make valgrind
+      - run:
+          name: "Run Sanitizer"
+          command: cd crypt && make sanitizer
       - run:
           name: "Run Gcov"
           command: gcov src/*.c

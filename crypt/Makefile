@@ -61,7 +61,8 @@ compile:
 sanitizer:
 	$(C_COMPILER) -g -Wall -Wfatal-errors -fsanitize=address $(DIRS) $(SRC_FILES) -o $(TARGET)
 
+valgrind:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./executable $(TARGET) 
+
 clean:
 	rm -rf *.o app
-
-cov:
