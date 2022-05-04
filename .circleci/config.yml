@@ -24,6 +24,9 @@ jobs:
           name: "Install valgrind"
           command: sudo apt install valgrind
       - run:
+          name: "Run Clean"
+          command: cd crypt && make clean
+      - run:
           name: "Run cppcheck"
           command: cppcheck crypt/src/*.c
       - run:
