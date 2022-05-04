@@ -65,12 +65,10 @@ valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all ./all_tests.out 
 
 gcov:
-	gcc --version
-	find  /usr/lib/gcc -name libgcov.a
-#gcov -b aes.c
-#gcov -b camellia.c
-#gcov -b crypt.c
-#gcov -b seed.c
+	gcov -b src/aes.c
+	gcov -b src/camellia.c
+	gcov -b src/crypt.c
+	gcov -b src/seed.c
 
 run:
 	- ./$(TARGET) -v
