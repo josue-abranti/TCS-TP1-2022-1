@@ -1,0 +1,432 @@
+        -:    0:Source:src/aes.c
+        -:    0:Graph:tests.out-aes.gcno
+        -:    0:Data:tests.out-aes.gcda
+        -:    0:Runs:1
+        -:    1:// FILE NAME  : aes.c
+        -:    2:// AUTHOR     : Rafael Garibotti
+        -:    3:// DEVELOPERS : Rafael Garibotti
+        -:    4:// E-mail     : rafael.garibotti@pucrs.br
+        -:    5://-----------------------------------------------------------------------------
+        -:    6:// RELEASE HISTORY
+        -:    7:// VERSION   DATE         DESCRIPTION
+        -:    8:// 1.0       2022-04-11   Initial version.
+        -:    9://-----------------------------------------------------------------------------
+        -:   10:
+        -:   11:#include "aes.h"
+        -:   12:
+        -:   13://-----------------------------------------------------------------------------
+        -:   14:// AES: 128/192/256-bits
+        -:   15://-----------------------------------------------------------------------------
+        -:   16:uint8_t
+function getSBoxValue called 276 returned 100% blocks executed 100%
+      276:   17:getSBoxValue(uint8_t num) {
+      276:   18:  return sbox[num];
+        -:   19:}
+        -:   20:
+        -:   21:uint8_t
+function getSBoxInvert called 0 returned 0% blocks executed 0%
+    #####:   22:getSBoxInvert(uint8_t num) {
+    #####:   23:  return rsbox[num];
+        -:   24:}
+        -:   25:
+        -:   26:// This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states. 
+        -:   27:void
+function KeyExpansion called 1 returned 100% blocks executed 100%
+        1:   28:KeyExpansion(void) {
+        -:   29:  uint8_t i, k;
+        -:   30:  uint8_t tempa[4]; // Used for the column/row operations
+        -:   31:
+        -:   32:  // The first round key is the key itself.
+        9:   33:  for(i = 0; i < Nk; ++i) {
+branch  0 taken 89%
+branch  1 taken 11% (fallthrough)
+        8:   34:    RoundKey[(i * 4) + 0] = ((Key[i] >> 24) & 0xFF);
+        8:   35:    RoundKey[(i * 4) + 1] = ((Key[i] >> 16) & 0xFF);
+        8:   36:    RoundKey[(i * 4) + 2] = ((Key[i] >>  8) & 0xFF);
+        8:   37:    RoundKey[(i * 4) + 3] =  (Key[i]        & 0xFF);
+        -:   38:  }
+        -:   39:
+        -:   40:  // All other round keys are found from the previous round keys.
+        -:   41:  //i == Nk
+       53:   42:  for(; i < Nb * (Nr + 1); ++i) {
+branch  0 taken 98%
+branch  1 taken 2% (fallthrough)
+       52:   43:    tempa[0] = RoundKey[(i-1) * 4 + 0];
+       52:   44:    tempa[1] = RoundKey[(i-1) * 4 + 1];
+       52:   45:    tempa[2] = RoundKey[(i-1) * 4 + 2];
+       52:   46:    tempa[3] = RoundKey[(i-1) * 4 + 3];
+        -:   47:
+       52:   48:    if (i % Nk == 0) {
+branch  0 taken 13% (fallthrough)
+branch  1 taken 87%
+        -:   49:    // This function shifts the 4 bytes in a word to the left once.
+        -:   50:    // [a0,a1,a2,a3] becomes [a1,a2,a3,a0]
+        -:   51:
+        -:   52:      // Function RotWord()
+        7:   53:      k = tempa[0];
+        7:   54:      tempa[0] = tempa[1];
+        7:   55:      tempa[1] = tempa[2];
+        7:   56:      tempa[2] = tempa[3];
+        7:   57:      tempa[3] = k;
+        -:   58:
+        -:   59:      // SubWord() is a function that takes a four-byte input word and 
+        -:   60:      // applies the S-box to each of the four bytes to produce an output word.
+        -:   61:
+        -:   62:      // Function Subword()
+        7:   63:      tempa[0] = getSBoxValue(tempa[0]);
+call    0 returned 100%
+        7:   64:      tempa[1] = getSBoxValue(tempa[1]);
+call    0 returned 100%
+        7:   65:      tempa[2] = getSBoxValue(tempa[2]);
+call    0 returned 100%
+        7:   66:      tempa[3] = getSBoxValue(tempa[3]);
+call    0 returned 100%
+        -:   67:
+        7:   68:      tempa[0] = tempa[0] ^ Rcon[i/Nk];
+        -:   69:    }
+        -:   70:
+       52:   71:    if (Nk == 8) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       52:   72:      if (i % Nk == 4) {
+branch  0 taken 12% (fallthrough)
+branch  1 taken 88%
+        -:   73:        // Function Subword()
+        6:   74:        tempa[0] = getSBoxValue(tempa[0]);
+call    0 returned 100%
+        6:   75:        tempa[1] = getSBoxValue(tempa[1]);
+call    0 returned 100%
+        6:   76:        tempa[2] = getSBoxValue(tempa[2]);
+call    0 returned 100%
+        6:   77:        tempa[3] = getSBoxValue(tempa[3]);
+call    0 returned 100%
+        -:   78:      }
+        -:   79:    }
+       52:   80:    RoundKey[i * 4 + 0] = RoundKey[(i - Nk) * 4 + 0] ^ tempa[0];
+       52:   81:    RoundKey[i * 4 + 1] = RoundKey[(i - Nk) * 4 + 1] ^ tempa[1];
+       52:   82:    RoundKey[i * 4 + 2] = RoundKey[(i - Nk) * 4 + 2] ^ tempa[2];
+       52:   83:    RoundKey[i * 4 + 3] = RoundKey[(i - Nk) * 4 + 3] ^ tempa[3];
+        -:   84:  }
+        1:   85:}
+        -:   86:
+        -:   87:// This function adds the round key to state.
+        -:   88:// The round key is added to the state by an XOR function.
+        -:   89:void
+function AddRoundKey called 15 returned 100% blocks executed 100%
+       15:   90:AddRoundKey(uint8_t round) {
+        -:   91:  uint8_t i, j;
+       75:   92:  for(i = 0; i < 4; ++i) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+      300:   93:    for(j = 0; j < 4; ++j) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+      240:   94:      state[i][j] ^= RoundKey[round * Nb * 4 + i * Nb + j];
+        -:   95:    }
+        -:   96:  }
+       15:   97:}
+        -:   98:
+        -:   99:// The SubBytes Function Substitutes the values in the
+        -:  100:// state matrix with values in an S-box.
+        -:  101:void
+function SubBytes called 14 returned 100% blocks executed 100%
+       14:  102:SubBytes(void) {
+        -:  103:  uint8_t i, j;
+       70:  104:  for(i = 0; i < 4; ++i) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+      280:  105:    for(j = 0; j < 4; ++j) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+      224:  106:      state[j][i] = getSBoxValue(state[j][i]);
+call    0 returned 100%
+        -:  107:    }
+        -:  108:  }
+       14:  109:}
+        -:  110:
+        -:  111:// The ShiftRows() function shifts the rows in the state to the left.
+        -:  112:// Each row is shifted with different offset.
+        -:  113:// Offset = Row number. So the first row is not shifted.
+        -:  114:void
+function ShiftRows called 14 returned 100% blocks executed 100%
+       14:  115:ShiftRows(void) {
+        -:  116:  uint8_t temp;
+        -:  117:
+        -:  118:  // Rotate first row 1 columns to left  
+       14:  119:  temp        = state[0][1];
+       14:  120:  state[0][1] = state[1][1];
+       14:  121:  state[1][1] = state[2][1];
+       14:  122:  state[2][1] = state[3][1];
+       14:  123:  state[3][1] = temp;
+        -:  124:
+        -:  125:  // Rotate second row 2 columns to left  
+       14:  126:  temp        = state[0][2];
+       14:  127:  state[0][2] = state[2][2];
+       14:  128:  state[2][2] = temp;
+        -:  129:
+       14:  130:  temp        = state[1][2];
+       14:  131:  state[1][2] = state[3][2];
+       14:  132:  state[3][2] = temp;
+        -:  133:
+        -:  134:  // Rotate third row 3 columns to left
+       14:  135:  temp        = state[0][3];
+       14:  136:  state[0][3] = state[3][3];
+       14:  137:  state[3][3] = state[2][3];
+       14:  138:  state[2][3] = state[1][3];
+       14:  139:  state[1][3] = temp;
+       14:  140:}
+        -:  141:
+        -:  142:uint8_t
+function xtime called 208 returned 100% blocks executed 100%
+      208:  143:xtime(uint8_t x) {
+      208:  144:  return ((x<<1) ^ (((x>>7) & 1) * 0x1b));
+        -:  145:}
+        -:  146:
+        -:  147:// MixColumns function mixes the columns of the state matrix
+        -:  148:void
+function MixColumns called 13 returned 100% blocks executed 100%
+       13:  149:MixColumns(void) {
+        -:  150:  uint8_t i;
+        -:  151:  //uint8_t Tmp; // GARIBA TESTAR
+       65:  152:  for(i = 0; i < 4; ++i) {  
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+       52:  153:    uint8_t t   = state[i][0];
+       52:  154:    uint8_t Tmp = state[i][0] ^ state[i][1] ^ state[i][2] ^ state[i][3] ;
+       52:  155:    uint8_t Tm  = state[i][0] ^ state[i][1] ; Tm = xtime(Tm);  state[i][0] ^= Tm ^ Tmp ;
+call    0 returned 100%
+       52:  156:    Tm  = state[i][1] ^ state[i][2] ; Tm = xtime(Tm);  state[i][1] ^= Tm ^ Tmp ;
+call    0 returned 100%
+       52:  157:    Tm  = state[i][2] ^ state[i][3] ; Tm = xtime(Tm);  state[i][2] ^= Tm ^ Tmp ;
+call    0 returned 100%
+       52:  158:    Tm  = state[i][3] ^ t ;           Tm = xtime(Tm);  state[i][3] ^= Tm ^ Tmp ;
+call    0 returned 100%
+        -:  159:  }
+       13:  160:}
+        -:  161:
+        -:  162:// Multiply is used to multiply numbers in the field GF(2^8)
+        -:  163:uint8_t
+function Multiply called 0 returned 0% blocks executed 0%
+    #####:  164:Multiply(uint8_t x, uint8_t y) {
+    #####:  165:  return (((y & 1) * x) ^
+    #####:  166:         ((y>>1 & 1) * xtime(x)) ^
+call    0 never executed
+    #####:  167:         ((y>>2 & 1) * xtime(xtime(x))) ^
+call    0 never executed
+call    1 never executed
+    #####:  168:         ((y>>3 & 1) * xtime(xtime(xtime(x)))) ^
+call    0 never executed
+call    1 never executed
+call    2 never executed
+    #####:  169:         ((y>>4 & 1) * xtime(xtime(xtime(xtime(x))))));
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+        -:  170:}
+        -:  171:
+        -:  172:// MixColumns function mixes the columns of the state matrix.
+        -:  173:// The method used to multiply may be difficult to understand for the inexperienced.
+        -:  174:// Please use the references to gain more information.
+        -:  175:void
+function InvMixColumns called 0 returned 0% blocks executed 0%
+    #####:  176:InvMixColumns(void) {
+        -:  177:  uint8_t i;
+    #####:  178:  for(i = 0; i < 4; ++i) { 
+branch  0 never executed
+branch  1 never executed
+    #####:  179:    uint8_t a = state[i][0];
+    #####:  180:    uint8_t b = state[i][1];
+    #####:  181:    uint8_t c = state[i][2];
+    #####:  182:    uint8_t d = state[i][3];
+        -:  183:
+    #####:  184:    state[i][0] = Multiply(a, 0x0e) ^ Multiply(b, 0x0b) ^ Multiply(c, 0x0d) ^ Multiply(d, 0x09);
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+    #####:  185:    state[i][1] = Multiply(a, 0x09) ^ Multiply(b, 0x0e) ^ Multiply(c, 0x0b) ^ Multiply(d, 0x0d);
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+    #####:  186:    state[i][2] = Multiply(a, 0x0d) ^ Multiply(b, 0x09) ^ Multiply(c, 0x0e) ^ Multiply(d, 0x0b);
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+    #####:  187:    state[i][3] = Multiply(a, 0x0b) ^ Multiply(b, 0x0d) ^ Multiply(c, 0x09) ^ Multiply(d, 0x0e);
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+        -:  188:  }
+    #####:  189:}
+        -:  190:
+        -:  191:// The SubBytes Function Substitutes the values in the
+        -:  192:// state matrix with values in an S-box.
+        -:  193:void
+function InvSubBytes called 0 returned 0% blocks executed 0%
+    #####:  194:InvSubBytes(void) {
+        -:  195:  uint8_t i, j;
+    #####:  196:  for(i = 0; i < 4; ++i) {
+branch  0 never executed
+branch  1 never executed
+    #####:  197:    for(j = 0; j < 4; ++j) {
+branch  0 never executed
+branch  1 never executed
+    #####:  198:      state[j][i] = getSBoxInvert(state[j][i]);
+call    0 never executed
+        -:  199:    }
+        -:  200:  }
+    #####:  201:}
+        -:  202:
+        -:  203:void
+function InvShiftRows called 0 returned 0% blocks executed 0%
+    #####:  204:InvShiftRows(void) {
+        -:  205:  uint8_t temp;
+        -:  206:
+        -:  207:  // Rotate first row 1 columns to right  
+    #####:  208:  temp = state[3][1];
+    #####:  209:  state[3][1] = state[2][1];
+    #####:  210:  state[2][1] = state[1][1];
+    #####:  211:  state[1][1] = state[0][1];
+    #####:  212:  state[0][1] = temp;
+        -:  213:
+        -:  214:  // Rotate second row 2 columns to right 
+    #####:  215:  temp = state[0][2];
+    #####:  216:  state[0][2] = state[2][2];
+    #####:  217:  state[2][2] = temp;
+        -:  218:
+    #####:  219:  temp = state[1][2];
+    #####:  220:  state[1][2] = state[3][2];
+    #####:  221:  state[3][2] = temp;
+        -:  222:
+        -:  223:  // Rotate third row 3 columns to right
+    #####:  224:  temp = state[0][3];
+    #####:  225:  state[0][3] = state[1][3];
+    #####:  226:  state[1][3] = state[2][3];
+    #####:  227:  state[2][3] = state[3][3];
+    #####:  228:  state[3][3] = temp;
+    #####:  229:}
+        -:  230:
+        -:  231:// AES encoder
+        -:  232:void
+function aes_enc called 1 returned 100% blocks executed 100%
+        1:  233:aes_enc(void) {
+        1:  234:  uint8_t round = 0;
+        -:  235:
+        -:  236:  // Add the First round key to the state before starting the rounds.
+        1:  237:  AddRoundKey(0); 
+call    0 returned 100%
+        -:  238:
+        -:  239:  // There will be Nr rounds.
+        -:  240:  // The first Nr-1 rounds are identical.
+        -:  241:  // These Nr-1 rounds are executed in the loop below.
+       14:  242:  for(round = 1; round < Nr; ++round) {
+branch  0 taken 93%
+branch  1 taken 7% (fallthrough)
+       13:  243:    SubBytes();
+call    0 returned 100%
+       13:  244:    ShiftRows();
+call    0 returned 100%
+       13:  245:    MixColumns();
+call    0 returned 100%
+       13:  246:    AddRoundKey(round);
+call    0 returned 100%
+        -:  247:  }
+        -:  248:
+        -:  249:  // The last round is given below.
+        -:  250:  // The MixColumns function is not here in the last round.
+        1:  251:  SubBytes();
+call    0 returned 100%
+        1:  252:  ShiftRows();
+call    0 returned 100%
+        1:  253:  AddRoundKey(Nr);
+call    0 returned 100%
+        1:  254:}
+        -:  255:
+        -:  256:// AES decoder
+        -:  257:void
+function aes_dec called 0 returned 0% blocks executed 0%
+    #####:  258:aes_dec(void) {
+    #####:  259:  uint8_t round = 0;
+        -:  260:
+        -:  261:  // Add the First round key to the state before starting the rounds.
+    #####:  262:  AddRoundKey(Nr); 
+call    0 never executed
+        -:  263:
+        -:  264:  // There will be Nr rounds.
+        -:  265:  // The first Nr-1 rounds are identical.
+        -:  266:  // These Nr-1 rounds are executed in the loop below.
+    #####:  267:  for(round = Nr-1; round > 0; round--) {
+branch  0 never executed
+branch  1 never executed
+    #####:  268:    InvShiftRows();
+call    0 never executed
+    #####:  269:    InvSubBytes();
+call    0 never executed
+    #####:  270:    AddRoundKey(round);
+call    0 never executed
+    #####:  271:    InvMixColumns();
+call    0 never executed
+        -:  272:  }
+        -:  273:
+        -:  274:  // The last round is given below.
+        -:  275:  // The MixColumns function is not here in the last round.
+    #####:  276:  InvShiftRows();
+call    0 never executed
+    #####:  277:  InvSubBytes();
+call    0 never executed
+    #####:  278:  AddRoundKey(0);
+call    0 never executed
+    #####:  279:}
+        -:  280:
+        -:  281:// AES: ECB mode
+        -:  282:void
+function aes called 1 returned 100% blocks executed 80%
+        1:  283:aes(uint32_t* key, const uint32_t* input, uint8_t type, uint8_t enc_dec, uint32_t* output) {
+        -:  284:  uint8_t i;
+        -:  285:
+        -:  286:  // Copy input to state
+        5:  287:  for(i = 0; i < 4; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+        4:  288:    state[i][0] = ((input[i] >> 24) & 0xFF);
+        4:  289:    state[i][1] = ((input[i] >> 16) & 0xFF);
+        4:  290:    state[i][2] = ((input[i] >>  8) & 0xFF);
+        4:  291:    state[i][3] =  (input[i]        & 0xFF);
+        -:  292:  }
+        -:  293:
+        -:  294:  // Update some private variables
+        1:  295:  switch (type) {
+branch  0 taken 100%
+branch  1 taken 0%
+branch  2 taken 0%
+        1:  296:    case 3  : Nk = 8; KEYLEN = 32; Nr = 14; break; // 256 bits
+    #####:  297:    case 2  : Nk = 6; KEYLEN = 24; Nr = 12; break; // 192 bits
+    #####:  298:    default : Nk = 4; KEYLEN = 16; Nr = 10; break; // 128 bits
+        -:  299:  }
+        -:  300:
+        -:  301:  // The KeyExpansion routine must be called before encryption
+        1:  302:  Key = key;
+        1:  303:  KeyExpansion();
+call    0 returned 100%
+        -:  304:
+        -:  305:  // The next function call encrypts the PlainText with the Key using AES algorithm
+        1:  306:  if (enc_dec)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  307:    aes_enc();
+call    0 returned 100%
+        -:  308:  else
+    #####:  309:    aes_dec();
+call    0 never executed
+        -:  310:
+        -:  311:  // Copy state to output
+        5:  312:  for(i = 0; i < 4; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+        4:  313:    output[i] = (state[i][0] << 24) + (state[i][1] << 16) + (state[i][2] << 8) + state[i][3];
+        -:  314:  }
+        1:  315:}

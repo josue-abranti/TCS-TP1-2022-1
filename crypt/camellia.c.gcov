@@ -1,0 +1,543 @@
+        -:    0:Source:src/camellia.c
+        -:    0:Graph:tests.out-camellia.gcno
+        -:    0:Data:tests.out-camellia.gcda
+        -:    0:Runs:1
+        -:    1:// FILE NAME  : camellia.c
+        -:    2:// AUTHOR     : Rafael Garibotti
+        -:    3:// DEVELOPERS : Rafael Garibotti
+        -:    4:// E-mail     : rafael.garibotti@pucrs.br
+        -:    5://-----------------------------------------------------------------------------
+        -:    6:// RELEASE HISTORY
+        -:    7:// VERSION   DATE         DESCRIPTION
+        -:    8:// 1.0       2022-04-11   Initial version.
+        -:    9://-----------------------------------------------------------------------------
+        -:   10:
+        -:   11:#include "camellia.h"
+        -:   12:
+        -:   13://-----------------------------------------------------------------------------
+        -:   14:// Camellia: 128/192/256-bits
+        -:   15://-----------------------------------------------------------------------------
+        -:   16:
+        -:   17:// Rotate Left circular shift 32 bits
+function ROL_32 called 0 returned 0% blocks executed 0%
+    #####:   18:static uint32_t ROL_32(uint32_t x, uint32_t n)
+        -:   19:{
+    #####:   20:	return x << n | x >> (32 - n);
+        -:   21:}
+        -:   22:
+        -:   23:// Rotate Left circular shift 128 bits
+function ROL_128 called 0 returned 0% blocks executed 0%
+    #####:   24:void ROL_128(uint64_t* y, const uint64_t* x, uint32_t n)
+        -:   25:{
+    #####:   26:	uint64_t temp = x[0];
+    #####:   27:	y[0] = (x[0] << n) | (x[1] >> (64 - n));
+    #####:   28:	y[1] = (x[1] << n) | (temp >> (64 - n));
+    #####:   29:}
+        -:   30:
+function F called 0 returned 0% blocks executed 0%
+    #####:   31:uint64_t F(uint64_t F_IN, uint64_t KE)
+        -:   32:{
+        -:   33:	uint64_t x;
+        -:   34:	uint8_t t1, t2, t3, t4, t5, t6, t7, t8;
+        -:   35:	uint8_t y1, y2, y3, y4, y5, y6, y7, y8;
+        -:   36:
+    #####:   37:	x = F_IN ^ KE;
+    #####:   38:	t1 = x >> 56;
+    #####:   39:	t2 = (uint8_t)(x >> 48);
+    #####:   40:	t3 = (uint8_t)(x >> 40);
+    #####:   41:	t4 = (uint8_t)(x >> 32);
+    #####:   42:	t5 = (uint8_t)(x >> 24);
+    #####:   43:	t6 = (uint8_t)(x >> 16);
+    #####:   44:	t7 = (uint8_t)(x >> 8);
+    #####:   45:	t8 = (uint8_t)x;
+    #####:   46:	t1 = sbox1[t1];
+    #####:   47:	t2 = sbox2[t2];
+    #####:   48:	t3 = sbox3[t3];
+    #####:   49:	t4 = sbox4[t4];
+    #####:   50:	t5 = sbox2[t5];
+    #####:   51:	t6 = sbox3[t6];
+    #####:   52:	t7 = sbox4[t7];
+    #####:   53:	t8 = sbox1[t8];
+    #####:   54:	y1 = t1 ^ t3 ^ t4 ^ t6 ^ t7 ^ t8;
+    #####:   55:	y2 = t1 ^ t2 ^ t4 ^ t5 ^ t7 ^ t8;
+    #####:   56:	y3 = t1 ^ t2 ^ t3 ^ t5 ^ t6 ^ t8;
+    #####:   57:	y4 = t2 ^ t3 ^ t4 ^ t5 ^ t6 ^ t7;
+    #####:   58:	y5 = t1 ^ t2 ^ t6 ^ t7 ^ t8;
+    #####:   59:	y6 = t2 ^ t3 ^ t5 ^ t7 ^ t8;
+    #####:   60:	y7 = t3 ^ t4 ^ t5 ^ t6 ^ t8;
+    #####:   61:	y8 = t1 ^ t4 ^ t5 ^ t6 ^ t7;
+    #####:   62:	return ((uint64_t)y1 << 56) | ((uint64_t)y2 << 48) | ((uint64_t)y3 << 40) | ((uint64_t)y4 << 32) |
+    #####:   63:		((uint64_t)y5 << 24) | ((uint64_t)y6 << 16) | ((uint64_t)y7 << 8) | y8;
+        -:   64:}
+        -:   65:
+function FL called 0 returned 0% blocks executed 0%
+    #####:   66:uint64_t FL(uint64_t FL_IN, uint64_t KE)
+        -:   67:{
+        -:   68:	uint32_t x1, x2;
+        -:   69:	uint32_t k1, k2;
+    #####:   70:	x1 = FL_IN >> 32;
+    #####:   71:	x2 = (uint32_t)FL_IN;
+    #####:   72:	k1 = KE >> 32;
+    #####:   73:	k2 = (uint32_t)KE;
+    #####:   74:	x2 = x2 ^ ROL_32((x1 & k1), 1);
+call    0 never executed
+    #####:   75:	x1 = x1 ^ (x2 | k2);
+    #####:   76:	return ((uint64_t)x1 << 32) | x2;
+        -:   77:}
+        -:   78:
+function FLINV called 0 returned 0% blocks executed 0%
+    #####:   79:uint64_t FLINV(uint64_t FLINV_IN, uint64_t KE)
+        -:   80:{
+        -:   81:	uint32_t y1, y2;
+        -:   82:	uint32_t k1, k2;
+    #####:   83:	y1 = FLINV_IN >> 32;
+    #####:   84:	y2 = (uint32_t)FLINV_IN;
+    #####:   85:	k1 = KE >> 32;
+    #####:   86:	k2 = (uint32_t)KE;
+    #####:   87:	y1 = y1 ^ (y2 | k2);
+    #####:   88:	y2 = y2 ^ ROL_32((y1 & k1), 1);
+call    0 never executed
+    #####:   89:	return ((uint64_t)y1 << 32) | y2;
+        -:   90:}
+        -:   91:
+function camellia_init called 0 returned 0% blocks executed 0%
+    #####:   92:void camellia_init(CamelliaContext* context, const uint64_t* key, uint16_t keyLen)
+        -:   93:{
+        -:   94:	uint8_t i;
+        -:   95:	uint64_t temp[2];
+        -:   96:
+        -:   97:	uint64_t KL[2];
+        -:   98:	uint64_t KR[2];
+        -:   99:	uint64_t KA[2];
+        -:  100:	uint64_t KB[2];
+        -:  101:	uint64_t D1;
+        -:  102:	uint64_t D2;
+        -:  103:
+        -:  104:	// generate KL and KR
+    #####:  105:	if (keyLen == 128)
+branch  0 never executed
+branch  1 never executed
+        -:  106:	{
+        -:  107:		// 18 (nr rounds) / 6 (nr rounds required for each feistel iteration)
+    #####:  108:		context->feistelIterations = 3;
+    #####:  109:		context->nrSubkeys = 26;
+        -:  110:
+    #####:  111:		KL[0] = key[0];
+    #####:  112:		KL[1] = key[1];
+    #####:  113:		KR[0] = 0;
+    #####:  114:		KR[1] = 0;
+        -:  115:	}
+    #####:  116:	else if (keyLen == 192 || keyLen == 256)
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+        -:  117:	{
+        -:  118:		// 24 (nr rounds) / 6 (nr rounds required for each feistel iteration)
+    #####:  119:		context->feistelIterations = 4;
+    #####:  120:		context->nrSubkeys = 34;
+        -:  121:
+    #####:  122:		KL[0] = key[0];
+    #####:  123:		KL[1] = key[1];
+    #####:  124:		KR[0] = key[2];
+    #####:  125:		KR[1] = key[3];
+        -:  126:
+        -:  127:		// special treatment for 192-bits key
+    #####:  128:		if (keyLen == 192)
+branch  0 never executed
+branch  1 never executed
+        -:  129:		{
+    #####:  130:			KR[1] = ~key[2];
+        -:  131:		}
+        -:  132:	}
+        -:  133:	else
+        -:  134:	{
+        -:  135:		//TODO create return status
+    #####:  136:		return;
+        -:  137:	}
+        -:  138:
+        -:  139:	// generate KA and KB
+    #####:  140:	D1 = KL[0] ^ KR[0];
+    #####:  141:	D2 = KL[1] ^ KR[1];
+    #####:  142:	D2 = D2 ^ F(D1, sigma[0]);
+call    0 never executed
+    #####:  143:	D1 = D1 ^ F(D2, sigma[1]);
+call    0 never executed
+    #####:  144:	D1 = D1 ^ KL[0];
+    #####:  145:	D2 = D2 ^ KL[1];
+    #####:  146:	D2 = D2 ^ F(D1, sigma[2]);
+call    0 never executed
+    #####:  147:	D1 = D1 ^ F(D2, sigma[3]);
+call    0 never executed
+    #####:  148:	KA[0] = D1;
+    #####:  149:	KA[1] = D2;
+    #####:  150:	D1 = KA[0] ^ KR[0];
+    #####:  151:	D2 = KA[1] ^ KR[1];
+    #####:  152:	D2 = D2 ^ F(D1, sigma[4]);
+call    0 never executed
+    #####:  153:	D1 = D1 ^ F(D2, sigma[5]);
+call    0 never executed
+    #####:  154:	KB[0] = D1;
+    #####:  155:	KB[1] = D2;
+        -:  156:
+        -:  157:	// generate subkeys
+    #####:  158:	i = 0;
+    #####:  159:	if (keyLen == 128)
+branch  0 never executed
+branch  1 never executed
+        -:  160:	{
+    #####:  161:		context->k[i++] = KL[0];
+    #####:  162:		context->k[i++] = KL[1];
+    #####:  163:		context->k[i++] = KA[0];
+    #####:  164:		context->k[i++] = KA[1];
+    #####:  165:		ROL_128(temp, KL, 15);
+call    0 never executed
+    #####:  166:		context->k[i++] = temp[0];
+    #####:  167:		context->k[i++] = temp[1];
+    #####:  168:		ROL_128(temp, KA, 15);
+call    0 never executed
+    #####:  169:		context->k[i++] = temp[0];
+    #####:  170:		context->k[i++] = temp[1];
+    #####:  171:		ROL_128(temp, KA, 30);
+call    0 never executed
+    #####:  172:		context->k[i++] = temp[0];
+    #####:  173:		context->k[i++] = temp[1];
+    #####:  174:		ROL_128(temp, KL, 30); // 30 + 15 = 45 left circular shift
+call    0 never executed
+    #####:  175:		ROL_128(temp, temp, 15);
+call    0 never executed
+    #####:  176:		context->k[i++] = temp[0];
+    #####:  177:		context->k[i++] = temp[1];
+    #####:  178:		ROL_128(temp, KA, 30); // 30 + 15 = 45 left circular shift
+call    0 never executed
+    #####:  179:		ROL_128(temp, temp, 15);
+call    0 never executed
+    #####:  180:		context->k[i++] = temp[0];
+    #####:  181:		ROL_128(temp, KL, 30); // 30 + 30 = 45 left circular shift
+call    0 never executed
+    #####:  182:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  183:		context->k[i++] = temp[1];
+    #####:  184:		ROL_128(temp, KA, 30); // 30 + 30 = 45 left circular shift
+call    0 never executed
+    #####:  185:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  186:		context->k[i++] = temp[0];
+    #####:  187:		context->k[i++] = temp[1];
+    #####:  188:		ROL_128(temp, KL, 30); // 30 + 30 + 17 = 77 left circular shift
+call    0 never executed
+    #####:  189:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  190:		ROL_128(temp, temp, 17);
+call    0 never executed
+    #####:  191:		context->k[i++] = temp[0];
+    #####:  192:		context->k[i++] = temp[1];
+    #####:  193:		ROL_128(temp, KL, 30); // 30 + 30 + 30 + 4 = 94 left circular shift
+call    0 never executed
+    #####:  194:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  195:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  196:		ROL_128(temp, temp, 4);
+call    0 never executed
+    #####:  197:		context->k[i++] = temp[0];
+    #####:  198:		context->k[i++] = temp[1];
+    #####:  199:		ROL_128(temp, KA, 30); // 30 + 30 + 30 + 4 = 94 left circular shift
+call    0 never executed
+    #####:  200:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  201:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  202:		ROL_128(temp, temp, 4);
+call    0 never executed
+    #####:  203:		context->k[i++] = temp[0];
+    #####:  204:		context->k[i++] = temp[1];
+    #####:  205:		ROL_128(temp, KL, 30); // 30 + 30 + 30 + 21 = 111 left circular shift
+call    0 never executed
+    #####:  206:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  207:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  208:		ROL_128(temp, temp, 21);
+call    0 never executed
+    #####:  209:		context->k[i++] = temp[0];
+    #####:  210:		context->k[i++] = temp[1];
+    #####:  211:		ROL_128(temp, KA, 30); // 30 + 30 + 30 + 21 = 111 left circular shift
+call    0 never executed
+    #####:  212:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  213:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  214:		ROL_128(temp, temp, 21);
+call    0 never executed
+    #####:  215:		context->k[i++] = temp[0];
+    #####:  216:		context->k[i++] = temp[1];
+        -:  217:	}
+        -:  218:	else
+        -:  219:	{
+    #####:  220:		context->k[i++] = KL[0];
+    #####:  221:		context->k[i++] = KL[1];
+    #####:  222:		context->k[i++] = KB[0];
+    #####:  223:		context->k[i++] = KB[1];
+    #####:  224:		ROL_128(temp, KR, 15);
+call    0 never executed
+    #####:  225:		context->k[i++] = temp[0];
+    #####:  226:		context->k[i++] = temp[1];
+    #####:  227:		ROL_128(temp, KA, 15);
+call    0 never executed
+    #####:  228:		context->k[i++] = temp[0];
+    #####:  229:		context->k[i++] = temp[1];
+    #####:  230:		ROL_128(temp, KR, 30);
+call    0 never executed
+    #####:  231:		context->k[i++] = temp[0];
+    #####:  232:		context->k[i++] = temp[1];
+    #####:  233:		ROL_128(temp, KB, 30);
+call    0 never executed
+    #####:  234:		context->k[i++] = temp[0];
+    #####:  235:		context->k[i++] = temp[1];
+    #####:  236:		ROL_128(temp, KL, 30);
+call    0 never executed
+    #####:  237:		ROL_128(temp, temp, 15);
+call    0 never executed
+    #####:  238:		context->k[i++] = temp[0];
+    #####:  239:		context->k[i++] = temp[1];
+    #####:  240:		ROL_128(temp, KA, 30);
+call    0 never executed
+    #####:  241:		ROL_128(temp, temp, 15);
+call    0 never executed
+    #####:  242:		context->k[i++] = temp[0];
+    #####:  243:		context->k[i++] = temp[1];
+    #####:  244:		ROL_128(temp, KL, 30);
+call    0 never executed
+    #####:  245:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  246:		context->k[i++] = temp[0];
+    #####:  247:		context->k[i++] = temp[1];
+    #####:  248:		ROL_128(temp, KR, 30);
+call    0 never executed
+    #####:  249:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  250:		context->k[i++] = temp[0];
+    #####:  251:		context->k[i++] = temp[1];
+    #####:  252:		ROL_128(temp, KB, 30);
+call    0 never executed
+    #####:  253:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  254:		context->k[i++] = temp[0];
+    #####:  255:		context->k[i++] = temp[1];
+    #####:  256:		ROL_128(temp, KL, 30); // 60 + 17 = 77 left circular shift
+call    0 never executed
+    #####:  257:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  258:		ROL_128(temp, temp, 17);
+call    0 never executed
+    #####:  259:		context->k[i++] = temp[0];
+    #####:  260:		context->k[i++] = temp[1];
+    #####:  261:		ROL_128(temp, KA, 30); // 60 + 17 = 77 left circular shift
+call    0 never executed
+    #####:  262:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  263:		ROL_128(temp, temp, 17);
+call    0 never executed
+    #####:  264:		context->k[i++] = temp[0];
+    #####:  265:		context->k[i++] = temp[1];
+    #####:  266:		ROL_128(temp, KR, 30); // 60 + 34 = 94 left circular shift
+call    0 never executed
+    #####:  267:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  268:		ROL_128(temp, temp, 34);
+call    0 never executed
+    #####:  269:		context->k[i++] = temp[0];
+    #####:  270:		context->k[i++] = temp[1];
+    #####:  271:		ROL_128(temp, KA, 30); // 60 + 34 = 94 left circular shift
+call    0 never executed
+    #####:  272:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  273:		ROL_128(temp, temp, 34);
+call    0 never executed
+    #####:  274:		context->k[i++] = temp[0];
+    #####:  275:		context->k[i++] = temp[1];
+    #####:  276:		ROL_128(temp, KL, 30); // 60 + 51 = 111 left circular shift
+call    0 never executed
+    #####:  277:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  278:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  279:		ROL_128(temp, temp, 21);
+call    0 never executed
+    #####:  280:		context->k[i++] = temp[0];
+    #####:  281:		context->k[i++] = temp[1];
+    #####:  282:		ROL_128(temp, KB, 30); // 60 + 51 = 111 left circular shift
+call    0 never executed
+    #####:  283:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  284:		ROL_128(temp, temp, 30);
+call    0 never executed
+    #####:  285:		ROL_128(temp, temp, 21);
+call    0 never executed
+    #####:  286:		context->k[i++] = temp[0];
+    #####:  287:		context->k[i++] = temp[1];
+        -:  288:	}
+        -:  289:}
+        -:  290:
+function camellia_enc called 0 returned 0% blocks executed 0%
+    #####:  291:void camellia_enc(const CamelliaContext* context, const uint64_t* block, uint64_t* out)
+        -:  292:{
+        -:  293:	// D[0] is D1 and D[1] is D2
+    #####:  294:	uint64_t D[2] = { block[0], block[1] };
+    #####:  295:	uint16_t subkey = 0;
+        -:  296:	uint16_t dIndex;
+        -:  297:	uint16_t oppositeIndex;
+        -:  298:	uint16_t round;
+        -:  299:	uint16_t feistelIteration;
+        -:  300:
+    #####:  301:	D[0] ^= context->k[subkey++]; // Prewhitening
+    #####:  302:	D[1] ^= context->k[subkey++];
+        -:  303:
+        -:  304:	// if 128-bits key then its 18 rounds divided into 3 feistel iterations
+        -:  305:	// if 192/256-bits key then its 24 rounds and divided into 4 feistel iterations
+    #####:  306:	for (feistelIteration = 0; feistelIteration < context->feistelIterations; feistelIteration++)
+branch  0 never executed
+branch  1 never executed
+        -:  307:	{
+        -:  308:		// each feistel iteration is 6 rounds
+    #####:  309:		for (round = 1; round <= 6; round++)
+branch  0 never executed
+branch  1 never executed
+        -:  310:		{
+        -:  311:			// calculate index
+    #####:  312:			dIndex = round % 2;
+    #####:  313:			oppositeIndex = (~dIndex & 0x1);
+        -:  314:
+        -:  315:			// D1 is calculated in even rounds and D2 in odd rounds
+    #####:  316:			D[dIndex] ^= F(D[oppositeIndex], context->k[subkey++]);
+call    0 never executed
+        -:  317:		}
+        -:  318:
+        -:  319:		// do not insert FL and FLINV functions in last iteration
+    #####:  320:		if (feistelIteration != (context->feistelIterations - 1))
+branch  0 never executed
+branch  1 never executed
+        -:  321:		{
+        -:  322:			// between each feistel iteration FL and FLINV functions are inserted
+    #####:  323:			D[0] = FL(D[0], context->k[subkey++]);
+call    0 never executed
+    #####:  324:			D[1] = FLINV(D[1], context->k[subkey++]);
+call    0 never executed
+        -:  325:		}
+        -:  326:	}
+        -:  327:
+    #####:  328:	D[1] ^= context->k[subkey++]; // Postwhitening
+    #####:  329:	D[0] ^= context->k[subkey++];
+        -:  330:
+        -:  331:	// copy cipher text to output
+    #####:  332:	out[0] = D[1];
+    #####:  333:	out[1] = D[0];
+    #####:  334:}
+        -:  335:
+function camellia_dec called 0 returned 0% blocks executed 0%
+    #####:  336:void camellia_dec(const CamelliaContext* context, const uint64_t* block, uint64_t* out)
+        -:  337:{
+        -:  338:	// D[0] is D1 and D[1] is D2
+    #####:  339:	uint64_t D[2] = { block[0], block[1] };
+    #####:  340:	uint16_t subkey = context->nrSubkeys - 1;
+        -:  341:	uint16_t dIndex;
+        -:  342:	uint16_t oppositeIndex;
+        -:  343:	uint16_t round;
+        -:  344:	uint16_t feistelIteration;
+        -:  345:
+        -:  346:	// Prewhitening
+    #####:  347:	D[1] ^= context->k[subkey--];
+    #####:  348:	D[0] ^= context->k[subkey--];
+        -:  349:
+        -:  350:	// if 128-bits key then its 18 rounds divided into 3 feistel iterations
+        -:  351:	// if 192/256-bits key then its 24 rounds and divided into 4 feistel iterations
+    #####:  352:	for (feistelIteration = 0; feistelIteration < context->feistelIterations; feistelIteration++)
+branch  0 never executed
+branch  1 never executed
+        -:  353:	{
+        -:  354:		// each feistel iteration is 6 rounds
+    #####:  355:		for (round = 1; round <= 6; round++)
+branch  0 never executed
+branch  1 never executed
+        -:  356:		{
+        -:  357:			// calculate index
+    #####:  358:			dIndex = round % 2;
+    #####:  359:			oppositeIndex = (~dIndex & 0x1);
+        -:  360:
+        -:  361:			// D1 is calculated in even rounds and D2 in odd rounds
+    #####:  362:			D[dIndex] ^= F(D[oppositeIndex], context->k[subkey--]);
+call    0 never executed
+        -:  363:		}
+        -:  364:
+        -:  365:		// do not insert FL and FLINV functions in last iteration
+    #####:  366:		if (feistelIteration != (context->feistelIterations - 1))
+branch  0 never executed
+branch  1 never executed
+        -:  367:		{
+        -:  368:			// between each feistel iteration FL and FLINV functions are inserted
+    #####:  369:			D[0] = FL(D[0], context->k[subkey--]);
+call    0 never executed
+    #####:  370:			D[1] = FLINV(D[1], context->k[subkey--]);
+call    0 never executed
+        -:  371:		}
+        -:  372:	}
+        -:  373:
+        -:  374:	// Postwhitening
+    #####:  375:	D[0] ^= context->k[subkey--];
+    #####:  376:	D[1] ^= context->k[subkey--];
+        -:  377:
+        -:  378:	// copy cipher text to output
+    #####:  379:	out[0] = D[1];
+    #####:  380:	out[1] = D[0];
+    #####:  381:}
+        -:  382:
+        -:  383:void
+function camellia called 0 returned 0% blocks executed 0%
+    #####:  384:camellia(uint32_t* key, uint32_t* input, uint8_t type, uint8_t enc_dec, uint32_t *output) {
+        -:  385:  CamelliaContext context;
+        -:  386:  int i, keysize;
+        -:  387:  uint64_t k[4];
+        -:  388:  uint64_t v[2];
+        -:  389:  uint64_t d[2];
+        -:  390:  
+        -:  391:  // 4 to 128 bits, 5 to 192 bits, 6 to 256 bits
+    #####:  392:  if (type == 6) {
+branch  0 never executed
+branch  1 never executed
+    #####:  393:    keysize = 256;
+        -:  394:  }
+    #####:  395:  else if (type == 5) {
+branch  0 never executed
+branch  1 never executed
+    #####:  396:	keysize = 192;
+        -:  397:  }
+        -:  398:  else {
+    #####:  399:	keysize = 128;
+        -:  400:  }
+        -:  401:  
+    #####:  402:  for(i = 0; i < type-2; i++) {
+branch  0 never executed
+branch  1 never executed
+    #####:  403:    k[i] = ((uint64_t)key[2*i] << 32) + (uint64_t)key[2*i+1];
+        -:  404:  }
+    #####:  405:  v[0] = ((uint64_t)input[0] << 32) + (uint64_t)input[1];
+    #####:  406:  v[1] = ((uint64_t)input[2] << 32) + (uint64_t)input[3];
+        -:  407:
+    #####:  408:  camellia_init(&context, k, keysize);
+call    0 never executed
+        -:  409:
+    #####:  410:  if (enc_dec)
+branch  0 never executed
+branch  1 never executed
+    #####:  411:    camellia_enc(&context, v, d);
+call    0 never executed
+        -:  412:  else
+    #####:  413:    camellia_dec(&context, v, d);
+call    0 never executed
+        -:  414:  
+    #####:  415:  output[0] = (uint32_t)(d[0] >> 32);
+    #####:  416:  output[1] = (uint32_t)(d[0]);
+    #####:  417:  output[2] = (uint32_t)(d[1] >> 32);
+    #####:  418:  output[3] = (uint32_t)(d[1]);
+    #####:  419:}

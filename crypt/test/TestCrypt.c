@@ -2,15 +2,120 @@
 #include "../src/crypt.h"
 #include "../../src/unity.h"
 #include "../../extras/fixture/src/unity_fixture.h"
+#include <string.h>
 
-int32_t* key;
-uint32_t* input, output;
-uint8_t type, enc_dec;
+struct element {
+  unsigned int key[8];
+  unsigned int input[4];
+  int type;
+  int enc_dec;
+  unsigned int output[4];
+};
+
+struct element arrayElements[48];
 
 TEST_GROUP(Crypt);
 
 TEST_SETUP(Crypt)
 {
+  //struct element  temp0 = {atoi("abcdefg"), atoi("hijk"), 3, 1, NULL};
+  //arrayElements[0] = temp0;
+  /*
+  struct element  temp1 = {(uint32_t *)4, (uint32_t *)"ASFSABassagASFA", 1, 0, (uint32_t *)"DEFG"};
+  arrayElements[1] = temp1;
+  struct element  temp2 = {(uint32_t *)4, (uint32_t *)"I@#%", 2, 0, (uint32_t *)"I@#%"};
+  arrayElements[2] = temp2;
+  struct element  temp3 = {(uint32_t *)4, (uint32_t *)"TESte$&*(", 3, 0, (uint32_t *)"TEST"};
+  arrayElements[3] = temp3;
+  struct element  temp4 = {(uint32_t *)4, (uint32_t *)"XUXUzinho123", 4, 0, (uint32_t *)"XUXU"};
+  arrayElements[4] = temp4;
+  struct element  temp5 = {(uint32_t *)4, (uint32_t *)"A123_asf(-", 5, 0, (uint32_t *)"A123"};
+  arrayElements[5] = temp5;
+  struct element  temp6 = {(uint32_t *)4, (uint32_t *)"12341001001", 6, 0, (uint32_t *)"1234"};
+  arrayElements[6] = temp6;
+  struct element  temp7 = {(uint32_t *)4, (uint32_t *)"*&#%&&|]", -1, 0, (uint32_t *)"*&#%"};
+  arrayElements[7] = temp7;
+  struct element  temp8 = {(uint32_t *)4, (uint32_t *)"", 0, 1, (uint32_t *)"ABCD"};
+  arrayElements[8] = temp8;
+  struct element  temp9 = {(uint32_t *)4, (uint32_t *)"ASFSABassagASFA", 1, 1, (uint32_t *)"DEFG"};
+  arrayElements[9] = temp9;
+  struct element  temp10 = {(uint32_t *)4, (uint32_t *)"I@#%", 2, 1, (uint32_t *)"I@#%"};
+  arrayElements[10] = temp10;
+  struct element  temp11 = {(uint32_t *)4, (uint32_t *)"TESte$&*(", 3, 1, (uint32_t *)"TEST"};
+  arrayElements[11] = temp11;
+  struct element  temp12 = {(uint32_t *)4, (uint32_t *)"XUXUzinho123", 4, 1, (uint32_t *)"XUXU"};
+  arrayElements[12] = temp12;
+  struct element  temp13 = {(uint32_t *)4, (uint32_t *)"A123_asf(-", 5, 1, (uint32_t *)"A123"};
+  arrayElements[13] = temp13;
+  struct element  temp14 = {(uint32_t *)4, (uint32_t *)"12341001001", 6, 1, (uint32_t *)"1234"};
+  arrayElements[14] = temp14;
+  struct element  temp15 = {(uint32_t *)4, (uint32_t *)"*&#%&&|]", -1, 1, (uint32_t *)"*&#%"};
+  arrayElements[15] = temp15;
+  struct element  temp16 = {(uint32_t *)6, (uint32_t *)"", 0, 0, (uint32_t *)"ABCDDD"};
+  arrayElements[16] = temp16;
+  struct element  temp17 = {(uint32_t *)6, (uint32_t *)"ASFSABassagASFA1010", 1, 0, (uint32_t *)"DEFG!$"};
+  arrayElements[17] = temp17;
+  struct element  temp18 = {(uint32_t *)6, (uint32_t *)"I123#%%%#*&", 2, 0, (uint32_t *)"I@#%__"};
+  arrayElements[18] = temp18;
+  struct element  temp19 = {(uint32_t *)6, (uint32_t *)"TESte$&*(##&#", 3, 0, (uint32_t *)"TEST12"};
+  arrayElements[19] = temp19;
+  struct element  temp20 = {(uint32_t *)6, (uint32_t *)"XUXUzinho123#$##", 4, 0, (uint32_t *)"XUXU"};
+  arrayElements[20] = temp20;
+  struct element  temp21 = {(uint32_t *)6, (uint32_t *)"A123_asf(-AaBc#$", 5, 0, (uint32_t *)"A12390"};
+  arrayElements[21] = temp21;
+  struct element  temp22 = {(uint32_t *)6, (uint32_t *)"1234100100110100000", 6, 0, (uint32_t *)"123450"};
+  arrayElements[22] = temp22;
+  struct element  temp23 = {(uint32_t *)6, (uint32_t *)"*&#%&&|]}{[]))", -1, 0, (uint32_t *)"*&#%$("};
+  arrayElements[23] = temp23;
+  struct element  temp24 = {(uint32_t *)6, (uint32_t *)"", 0, 1, (uint32_t *)"ABCDDD"};
+  arrayElements[24] = temp24;
+  struct element  temp25 = {(uint32_t *)6, (uint32_t *)"ASFSABassagASFA1010", 1, 1, (uint32_t *)"DEFG!$"};
+  arrayElements[25] = temp25;
+  struct element  temp26 = {(uint32_t *)6, (uint32_t *)"I123#%%%#*&", 2, 1, (uint32_t *)"I@#%__"};
+  arrayElements[26] = temp26;
+  struct element  temp27 = {(uint32_t *)6, (uint32_t *)"TESte$&*(##&#", 3, 1, (uint32_t *)"TEST12"};
+  arrayElements[27] = temp27;
+  struct element  temp28 = {(uint32_t *)6, (uint32_t *)"XUXUzinho123#$##", 4, 1, (uint32_t *)"XUXU"};
+  arrayElements[28] = temp28;
+  struct element  temp29 = {(uint32_t *)6, (uint32_t *)"A123_asf(-AaBc#$", 5, 1, (uint32_t *)"A12390"};
+  arrayElements[29] = temp29;
+  struct element  temp30 = {(uint32_t *)6, (uint32_t *)"1234100100110100000", 6, 1, (uint32_t *)"123450"};
+  arrayElements[30] = temp30;
+  struct element  temp31 = {(uint32_t *)6, (uint32_t *)"*&#%&&|]}{[]))", -1, 1, (uint32_t *)"*&#%$("};
+  arrayElements[31] = temp31;
+  struct element  temp32 = {(uint32_t *)8, (uint32_t *)"", 0, 0, (uint32_t *)"ABCDDDEF"};
+  arrayElements[32] = temp32;
+  struct element  temp33 = {(uint32_t *)8, (uint32_t *)"ASFSABassagASFA1010911", 1, 0, (uint32_t *)"DEFG!$%#"};
+  arrayElements[33] = temp33;
+  struct element  temp34 = {(uint32_t *)8, (uint32_t *)"I123#%%%#*&911", 2, 0, (uint32_t *)"I@#%__!#"};
+  arrayElements[34] = temp34;
+  struct element  temp35 = {(uint32_t *)8, (uint32_t *)"TESte$&*(##&#911", 3, 0, (uint32_t *)"TEST1200"};
+  arrayElements[35] = temp35;
+  struct element  temp36 = {(uint32_t *)8, (uint32_t *)"XUXUzinho123#$##SoS911", 4, 0, (uint32_t *)"XUXU"};
+  arrayElements[36] = temp36;
+  struct element  temp37 = {(uint32_t *)8, (uint32_t *)"A123_asf(-AaBc#$Sos911", 5, 0, (uint32_t *)"A1239000"};
+  arrayElements[37] = temp37;
+  struct element  temp38 = {(uint32_t *)8, (uint32_t *)"123410010011099000", 6, 0, (uint32_t *)"12345023"};
+  arrayElements[38] = temp38;
+  struct element  temp39 = {(uint32_t *)8, (uint32_t *)"*&#%&&|]}{[]))!!!!&&&&", -1, 0, (uint32_t *)"*&#%$()!"};
+  arrayElements[39] = temp39;
+  struct element  temp40 = {(uint32_t *)8, (uint32_t *)"ABCDDDEFaabbccddeeff", 0, 1, (uint32_t *)"ABCDDDEF"};
+  arrayElements[40] = temp40;
+  struct element  temp41 = {(uint32_t *)8, (uint32_t *)"DEFG!$%#defgh12345", 1, 1, (uint32_t *)"DEFG!$%#"};
+  arrayElements[41] = temp41;
+  struct element  temp42 = {(uint32_t *)8, (uint32_t *)"I@#%__!#())!Assa><", 2, 1, (uint32_t *)"I@#%__!#"};
+  arrayElements[42] = temp42;
+  struct element  temp43 = {(uint32_t *)8, (uint32_t *)"TEST1200xix_iaIA", 3, 1, (uint32_t *)"TEST1200"};
+  arrayElements[43] = temp43;
+  struct element  temp44 = {(uint32_t *)8, (uint32_t *)"CONFIDENCIAL_g14", 4, 1, (uint32_t *)"XUXU"};
+  arrayElements[44] = temp44;
+  struct element  temp45 = {(uint32_t *)8, (uint32_t *)"A1239000abecedefg", 5, 1, (uint32_t *)"A1239000"};
+  arrayElements[45] = temp45;
+  struct element  temp46 = {(uint32_t *)8, (uint32_t *)"1234502399", 6, 1, (uint32_t *)"12345023"};
+  arrayElements[46] = temp46;
+  struct element  temp47 = {(uint32_t *)8, (uint32_t *)"*&#%$()!!!<<>>&&&", -1, 1, (uint32_t *)"*&#%$()!"};
+  arrayElements[47] = temp47;
+  */
 }
 
 TEST_TEAR_DOWN(Crypt)
@@ -19,15 +124,25 @@ TEST_TEAR_DOWN(Crypt)
 
 TEST(Crypt, TestCrypt1)
 {
-  key=4;
-  input="";
-  type=0;
-  enc_dec=0;
-  output="ABCD";
+  unsigned int key[8] = {
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
+  };
 
-  TEST_ASSERT_EQUAL(0, crypt(key, input, type, enc_dec, output));
+  unsigned int input[4] = {'a', 'b', 'c', 'd'};
+
+  int type = 3;
+
+  int enc_dec = 1;
+
+  unsigned int output[4];
+
+  int result = crypt(key, input, type, enc_dec, output);//arrayElements[0].key, arrayElements[0].input, arrayElements[0].type, arrayElements[0].enc_dec, arrayElements[0].output);
+  printf("Resultado teste: %d", result);
+  TEST_ASSERT_EQUAL(0, result);
 }
 
+
+/*
 TEST(Crypt, TestCrypt2)
 {
   key=4;
@@ -544,3 +659,4 @@ TEST(Crypt, TestCrypt48)
 
   TEST_ASSERT_EQUAL(0, crypt(key, input, type, enc_dec, output));
 }
+*/
