@@ -40,6 +40,7 @@ CFLAGS += -Wundef
 CFLAGS += -Wold-style-definition
 CFLAGS += -fprofile-arcs
 CFLAGS += -ftest-coverage
+CFLAGS += --coverage
 
 TARGET_BASE=tests
 TARGET = $(TARGET_BASE)$(TARGET_EXTENSION)
@@ -65,14 +66,15 @@ valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all ./all_tests.out 
 
 gcov:
-	grep a.out
-#gcov -b aes.c
-#gcov -b camellia.c
-#gcov -b crypt.c
-#gcov -b seed.c
+	gcov -b aes.c
+	gcov -b camellia.c
+	gcov -b crypt.c
+	gcov -b seed.c
 
 run:
 	- ./$(TARGET) -v
 
 clean:
 	rm -rf *.o app
+	rm -rf *.gcov
+	rm -rf *.gcno
