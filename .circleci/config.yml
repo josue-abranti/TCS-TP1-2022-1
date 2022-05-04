@@ -34,7 +34,7 @@ jobs:
           command: cd crypt && make compile
       - run:
           name: "Run Valgrind"
-          command: cd crypt && chown -R $USER:$USER ./ && make valgrind
+          command: cd crypt && make valgrind
       - run:
           name: "Run Sanitizer"
           command: cd crypt && make sanitizer
