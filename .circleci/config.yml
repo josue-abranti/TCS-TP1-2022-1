@@ -24,14 +24,20 @@ jobs:
           name: "Install valgrind"
           command: sudo apt install valgrind
       - run:
+          name: "Install Sanitizer"
+          command: sudo apt-get install -y sanitizer
+      - run:
           name: "Run cppcheck"
           command: cppcheck crypt/src/*.c
       - run:
-          name: "Test Routine Make"
-          command: cd crypt && make
+          name: "Run Sanitizer"
+          command: make sanitizer
       - run:
           name: "Test Routine Make"
-          command: cd crypt && make
+          command: cd crypt && make compile
+      - run:
+          name: "Run Gcov"
+          command: gcov src/*.c
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows

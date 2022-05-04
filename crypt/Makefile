@@ -25,8 +25,7 @@ endif
 
 UNITY_ROOT=..
 
-CFLAGS=-c
-CFLAGS += -Wall
+CFLAGS = -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wpointer-arith
 CFLAGS += -Wcast-align
@@ -39,41 +38,28 @@ CFLAGS += -Wno-unknown-pragmas
 CFLAGS += -Wstrict-prototypes
 CFLAGS += -Wundef
 CFLAGS += -Wold-style-definition
+CFLAGS += -fprofile-arcs
+CFLAGS += -ftest-coverage
 
-SRC_FILES1=$(UNITY_ROOT)/src/*
-SYMBOLS=
+TARGET_BASE=tests
+TARGET = $(TARGET_BASE)$(TARGET_EXTENSION)
+SRC_FILES=\
+  $(UNITY_ROOT)/src/unity.c \
+  $(UNITY_ROOT)/extras/fixture/src/unity_fixture.c \
+  src/aes.c \
+  src/camellia.c \
+  src/crypt.c \
+  src/seed.c \
+  test/TestCrypt.c \
+  test/test_runners/TestCrypt_Runner.c \
+  test/test_runners/all_tests.c
+DIRS=-Isrc -I$(UNITY_ROOT)/src -I$(UNITY_ROOT)/extras/fixture/src
 
-CC = gcc
-#CFLAGS = -c -Wall -fprofile-arcs -ftest-coverage -fsanitize=address -static-libasan
+compile:
+	$(C_COMPILER) $(CFLAGS) $(DIRS) $(SRC_FILES) -o $(TARGET)
 
-##### Project specific libraries #####
-SRC_FILES =  $(SRC_FILES1)
-SRC_FILES += $(wildcard src/*.c)
-TEST_FILES += $(wildcard test/*.c)
-
-
-##### General commands #####
-all: $(SRC_FILES) $(TEST_FILES)
-	$(CC) $(CFLAGS) $^
-	$(CC) *.o -o app
-	rm -rf *.o
-
-#all: app
-
-#app: main.o aes.o camellia.o seed.o
-#	$(CC) main.o aes.o camellia.o seed.o -o app
-#	rm -rf *.o
-
-#main.o: test/main.c
-#	$(CC) $(CFLAGS) $^
-
-#aes.o: src/aes.c
-#	$(CC) $(CFLAGS) $^
-#camellia.o: src/camellia.c
-#	$(CC) $(CFLAGS) $^
-
-#seed.o: src/seed.c
-#	$(CC) $(CFLAGS) $^
+sanitizer:
+	$(C_COMPILER) -g -Wall -Wfatal-errors -fsanitize=address $(DIRS) $(SRC_FILES) -o $(TARGET)
 
 clean:
 	rm -rf *.o app
