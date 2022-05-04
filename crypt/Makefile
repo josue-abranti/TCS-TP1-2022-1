@@ -54,13 +54,12 @@ SRC_FILES=\
   test/test_runners/TestCrypt_Runner.c \
   test/test_runners/all_tests.c
 DIRS=-Isrc -I$(UNITY_ROOT)/src -I$(UNITY_ROOT)/extras/fixture/src
-SYMBOLS=
 
 compile:
-	$(C_COMPILER) $(CFLAGS) $(DIRS) $(SYMBOLS) $(SRC_FILES) -o $(TARGET)
+	$(C_COMPILER) $(CFLAGS) $(DIRS) $(SRC_FILES) -o $(TARGET)
 
 sanitizer:
-	$(C_COMPILER) -g -Wall -Wfatal-errors -fsanitize=address $(DIRS) $(SYMBOLS) $(SRC_FILES) -o $(TARGET)
+	$(C_COMPILER) -g -Wall -Wfatal-errors -fsanitize=address $(DIRS) $(SRC_FILES) -o $(TARGET)
 
 valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all ./all_tests.out 
