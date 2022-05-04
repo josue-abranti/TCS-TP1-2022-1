@@ -142,6 +142,25 @@ TEST(Crypt, TestCrypt1)
   TEST_ASSERT_EQUAL(0, result);
 }
 
+TEST(Crypt, TestCrypt2)
+{
+  unsigned int key[4] = {
+    'I', '@', '#', '$'
+  };
+
+  unsigned int input[4] = {'a', 'b', 'c', 'd'};
+
+  int type = 2;
+
+  int enc_dec = 0;
+
+  unsigned int output[4];
+
+  int result = crypt(key, input, type, enc_dec, output);//arrayElements[0].key, arrayElements[0].input, arrayElements[0].type, arrayElements[0].enc_dec, arrayElements[0].output);
+  printf("Resultado teste: %d", result);
+  TEST_ASSERT_EQUAL(0, result);
+}
+
 
 /*
 TEST(Crypt, TestCrypt2)
