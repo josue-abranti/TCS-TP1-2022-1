@@ -31,7 +31,7 @@ jobs:
           command: cd crypt && make compile
       - run:
           name: "Run Valgrind"
-          command: make valgrind
+          command: echo "$PWD"#make valgrind
       - run:
           name: "Run Sanitizer"
           command: make sanitizer
