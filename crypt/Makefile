@@ -69,6 +69,7 @@ gcov:
 	gcov -b camellia.c
 	gcov -b crypt.c
 	gcov -b seed.c
+	gcov -b seed.c
 
 run:
 	- ./$(TARGET) -v
