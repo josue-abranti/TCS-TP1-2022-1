@@ -34,7 +34,7 @@ jobs:
           command: cd crypt && make compile
       - run:
           name: "Run Valgrind"
-          command: cd crypt && make valgrind
+          command: cd crypt && sudo chmod a+x ./all_tests.out && make valgrind
       - run:
           name: "Run Sanitizer"
           command: cd crypt && make sanitizer
