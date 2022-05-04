@@ -19,11 +19,11 @@ TEST_TEAR_DOWN(Crypt)
 
 TEST(Crypt, TestCrypt1)
 {
-  key = 1;
-  input = "ABC";
-  output = 10;
-  type = 0;
-  enc_dec = 0;
+  key=4;
+  input="ABCD";
+  type=0;
+  enc_dec=0;
+  output="ABCD";
 
   TEST_ASSERT_EQUAL(0, crypt(key, input, type, enc_dec, output));
 }

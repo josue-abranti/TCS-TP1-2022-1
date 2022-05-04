@@ -70,5 +70,8 @@ gcov:
 	gcov crypt.c
 	gcov seed.c
 
+run:
+	- ./$(TARGET) -v
+
 clean:
 	rm -rf *.o app

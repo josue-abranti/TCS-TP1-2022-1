@@ -30,14 +30,17 @@ jobs:
           name: "Run cppcheck"
           command: cppcheck crypt/src/*.c
       - run:
-          name: "Test Routine Make"
+          name: "Compile"
           command: cd crypt && make compile
       - run:
           name: "Run Valgrind"
           command: cd crypt && sudo chmod a+x ./all_tests.out && make valgrind
       - run:
-          name: "Run Sanitizer"
+          name: "Run Tests"
           command: cd crypt && make sanitizer
+      - run:
+          name: "Run Sanitizer"
+          command: cd crypt && run
       - run:
           name: "Run Gcov"
           command: cd crypt && sudo chmod a+x src && make gcov
