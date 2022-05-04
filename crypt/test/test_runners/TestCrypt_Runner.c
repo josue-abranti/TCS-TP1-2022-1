@@ -6,7 +6,7 @@ TEST_GROUP_RUNNER(Crypt)
   RUN_TEST_CASE(Crypt, TestCrypt1);
   printf("RUN_TEST_CASE=TestCrypt1");
   RUN_TEST_CASE(Crypt, TestCrypt2);
-  printf("RUN_TEST_CASE=TestCrypt2")
+  printf("RUN_TEST_CASE=TestCrypt2");
   /*
   RUN_TEST_CASE(Crypt, TestCrypt2);
   printf("RUN_TEST_CASE=TestCrypt2");
