@@ -12,6 +12,7 @@ struct element {
   unsigned int output[4];
 };
 
+
 struct element arrayElements[48];
 
 TEST_GROUP(Crypt);
