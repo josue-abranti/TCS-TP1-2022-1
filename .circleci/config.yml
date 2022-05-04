@@ -28,7 +28,7 @@ jobs:
           command: cppcheck crypt/src/*.c
       - run:
           name: "Test Routine Make"
-          command: d crypt && make compile
+          command: cd crypt && make compile
       - run:
           name: "Run Valgrind"
           command: cd crypt && make valgrind
