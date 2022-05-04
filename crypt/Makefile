@@ -65,10 +65,10 @@ valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all ./all_tests.out 
 
 gcov:
-	gcov -b tests.out-aes.c
-	gcov -b tests.out-camellia.c
-	gcov -b tests.out-crypt.c
-	gcov -b tests.out-seed.c
+	gcov -b aes.c
+	gcov -b camellia.c
+	gcov -b crypt.c
+	gcov -b seed.c
 
 run:
 	- ./$(TARGET) -v

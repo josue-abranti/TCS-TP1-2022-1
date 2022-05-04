@@ -43,7 +43,7 @@ jobs:
           command: cd crypt && make sanitizer
       - run:
           name: "Run Gcov"
-          command: cd crypt && ls #cd crypt && make gcov
+          command: cd crypt && make gcov
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
