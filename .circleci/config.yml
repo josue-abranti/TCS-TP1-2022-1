@@ -34,10 +34,10 @@ jobs:
           command: cd crypt && make compile
       - run:
           name: "Run Valgrind"
-          command: cd crypt && make valgrind
+          command: cd crypt && sudo && make valgrind
       - run:
           name: "Run Sanitizer"
-          command: make sanitizer
+          command: cd crypt && make sanitizer
       - run:
           name: "Run Gcov"
           command: gcov src/*.c
